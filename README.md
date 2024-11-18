@@ -1,5 +1,5 @@
 # campaign-reporter
-Campaign-Reporter_Logo.png
+[Campaign-Reporter_Logo.png](https://github.com/strategyAce/campaign-reporter/blob/a089583b17d3a631970dcb4425e88003c5b0b4de/Campaign-Reporter_Logo.png)
 
 # Campaign Election Reporter Application ("Reporter")
 
