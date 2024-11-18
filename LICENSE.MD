@@ -1,7 +1,7 @@
 # Proprietary Software License Agreement
 
-**Effective Date:** [Insert Date]  
-**Software Name:** [Your Software Tool Name]  
+**Effective Date:** 11/17/2024 
+**Software Name:** Campaign Reporter App ("Reporter") 
 **Owner:** Strategy Ace LLC 
 
 ---
