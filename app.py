@@ -33,7 +33,7 @@ def voter_engagement_report(df):
     st.subheader("Engagement Tracker Data File")
     # Select data source
     st.write("Select CSV File Source")
-    data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"])
+    data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"], key=999)
     # Initialize DataFrame
     df = None
 
@@ -171,7 +171,7 @@ def election_runup_report(df):
     st.subheader("Pre-Election Day Data File")
     # Select data source
     st.write("Select CSV File Source")
-    data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"])
+    data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"],key=998)
     # Initialize DataFrame
     df = None
 
