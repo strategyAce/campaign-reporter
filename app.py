@@ -311,7 +311,7 @@ def main():
                                    ["Voter Engagement", "Election Runup Analysis"])
 
         # Data source selection
-        data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"],placeholder="Choose an option")
+        data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"])
         uploaded_file = None
         drive_path = None
 
