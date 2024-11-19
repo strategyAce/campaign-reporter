@@ -142,173 +142,147 @@ st.success("Voter Engagement Report Generated.")  # Placeholder
 
 # Election Runup Analysis Report logic
 def election_runup_report(df):
-    st.subheader("Pre-Election Day Data File")
-    # Select data source
-    st.write("Select CSV File Source")
-    data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"],key=997)
-    # Initialize DataFrame
-    df = None
-
-    if data_source == "Local file upload":
-        # File upload
-        uploaded_file = st.file_uploader("Upload a CSV file", type="csv", key=996)
-        if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
-    elif data_source == "Google Drive path":
-        # Text input for Google Drive file path
-        drive_path = st.text_input("Enter the full path to your CSV file in Google Drive:")
-        if drive_path:
-            if os.path.exists(drive_path):  # Check if the file exists
-                df = pd.read_csv(drive_path)
-            else:
-                st.error("The specified path does not exist. Please check the path and try again.")
-
     st.divider()
     st.header("Election Results Report")
 
-    if df is not None:
-        # Ensure required columns are present in the CSV file
-        required_columns = ["DATE", "VBM-DEM", "VBM-REP", "VBM-NPA", "VBM-TOTAL", "VBM-CUM", "EV-DEM", "EV-REP", "EV-NPA","EV-TOTAL","EV-CUM","ED-DEM","ED-REP","ED-NPA","ED-TOTAL","TOTAL VOTES","CUM TOTAL"]
-        if set(df.columns) == set(required_columns):
-            col1,col2 =st.columns(2)
-            with col1:
-                st.write(f"Current update date: {df['DATE'].iloc[-1]}")
-            with col2:
-                st.write(f"Previous update date: {df['DATE'].iloc[-2]}")
-            st.metric(label="Total Votes Cast This Election", value=int(df['CUM TOTAL'].iloc[-1]), delta=int(df['CUM TOTAL'].iloc[-1] - df['CUM TOTAL'].iloc[-2]))
-            col1,col2,col3 = st.columns(3)
-            with col1:
-                total_dem = int(df['VBM-DEM'].iloc[-1] + df['EV-DEM'].iloc[-1])
-                prev_dem = int(df['VBM-DEM'].iloc[-2] + df['EV-DEM'].iloc[-2])
-                st.metric(label="Total DEM Votes", value=total_dem, delta=total_dem-prev_dem)
-            with col2:
-                total_rep = int(df['VBM-REP'].iloc[-1] + df['EV-REP'].iloc[-1])
-                prev_rep = int(df['VBM-REP'].iloc[-2] + df['EV-REP'].iloc[-2])
-                st.metric(label="Total REP Votes", value=total_rep, delta=total_rep-prev_rep)
-            with col3:
-                total_npa = int(df['VBM-NPA'].iloc[-1] + df['EV-NPA'].iloc[-1])
-                prev_npa = int(df['VBM-NPA'].iloc[-2] + df['EV-NPA'].iloc[-2])
-                st.metric(label="Total NPA/Other Votes", value=total_npa, delta=total_npa-prev_npa)
-
-            st.subheader("")
-            # Create Vote over Time Line Plot
-            plt.figure(figsize=(10, 6))
-            plt.plot(df["DATE"], df["CUM TOTAL"], label="Total Votes")
-            plt.plot(df["DATE"], df["EV-CUM"], label="Total Early Votes")
-            plt.plot(df["DATE"], df["VBM-CUM"], label="Total Vote By Mail Votes")
-            # Set labels and title
-            plt.xlabel("Date")
-            plt.ylabel("Votes")
-            plt.title("Election Votes Over Time")
-            # Add legend
-            plt.legend()
-            # Rotate x-axis labels for better readability
-            plt.xticks(rotation=45)
-            # Show the plot
-            plt.grid(True)
-            plt.tight_layout()
-            st.pyplot(plt)
-
-            st.subheader("")
-            # VBM vs Early Vote Pie Chart
-            # Calculate the percentage of each vote type
-            vote_by_mail_percentage = (df['VBM-CUM'].iloc[-1] / df['CUM TOTAL'].iloc[-1]) * 100
-            early_vote_percentage = (df['EV-CUM'].iloc[-1]/ df['CUM TOTAL'].iloc[-1]) * 100
-            # Create the pie chart
-            plt.figure(figsize=(6, 6))
-            # Define the data for the pie chart
-            data = [vote_by_mail_percentage, early_vote_percentage]
-            labels = ['Vote By Mail', 'Early Vote']
-            colors = ['lightblue', 'lightgreen']
-            # Create the pie chart
-            plt.pie(data, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
-            # Add title
-            plt.title('Vote By Mail vs. Early Vote')
-            # Display the chart
-            st.pyplot(plt)
-
-            st.subheader("")
-            # VBM Party Breadkdown Pie Chart
-            # Calculate the percentage of each vote type
-            vbm_dem = (df['VBM-DEM'].sum() / df['VBM-CUM'].iloc[-1]) * 100
-            vbm_rep = (df['VBM-REP'].sum() / df['VBM-CUM'].iloc[-1]) * 100
-            vbm_npa = (df['VBM-NPA'].sum() / df['VBM-CUM'].iloc[-1]) * 100
-            # Create the pie chart
-            plt.figure(figsize=(6, 6))
-            # Define the data for the pie chart
-            data = [vbm_dem, vbm_rep, vbm_npa]
-            labels = ['Dem', 'Rep', 'NPA/Other']
-            colors = ['blue', 'red', 'green']
-            # Create the pie chart
-            plt.pie(data, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
-            # Add title
-            plt.title('Vote By Mail by Party')
-            # Display the chart
-            st.pyplot(plt)
-
-            st.subheader("")
-            # EV Party Breadkdown Pie Chart
-            # Calculate the percentage of each vote type
-            ev_dem = (df['EV-DEM'].sum() / df['EV-CUM'].iloc[-1]) * 100
-            ev_rep = (df['EV-REP'].sum() / df['EV-CUM'].iloc[-1]) * 100
-            ev_npa = (df['EV-NPA'].sum() / df['EV-CUM'].iloc[-1]) * 100
-            # Create the pie chart
-            plt.figure(figsize=(6, 6))
-            # Define the data for the pie chart
-            data = [ev_dem, ev_rep, ev_npa]
-            labels = ['Dem', 'Rep', 'NPA/Other']
-            colors = ['blue', 'red', 'green']
-            # Create the pie chart
-            plt.pie(data, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
-            # Add title
-            plt.title('Early Voting by Party')
-            # Display the chart
-            st.pyplot(plt)
-
-            st.divider()
-            #Analysis tool for determining current race status
-            st.header("The Guestimator Tool")
-            st.write("Use the sliders below to guestimate how your candidate is performing. The tool uses the uploaded current vote data.")
-            totaldemvotes = df['VBM-DEM'].sum() + df['EV-DEM'].sum()
-            totalrepvotes = df['VBM-REP'].sum() + df['EV-REP'].sum()
-            totalnpavotes = df['VBM-NPA'].sum() + df['EV-NPA'].sum()
-            col1,col2 = st.columns(2)
-            with col1:
-                st.subheader("Good Guys")
-                gooddem = st.slider("Est. percentage of DEM Vote for your candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
-                goodrep = st.slider("Est. percentage of REP Vote for your candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
-                goodnpa = st.slider("Est. percentage of NPA/Other Vote for your candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
-            with col2:
-                st.subheader("Bad Guys")
-                baddem = st.slider("Est. percentage of DEM Vote for other candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
-                badrep = st.slider("Est. percentage of REP Vote for other candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
-                badnpa = st.slider("Est. percentage of NPA/Other Vote for other candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
-            #Calculate Total Votes for each Candidate
-            totalgood = (gooddem*totaldemvotes) + (goodrep*totalrepvotes) + (goodnpa*totalnpavotes)
-            totalbad = (baddem*totaldemvotes) + (badrep*totalrepvotes) + (badnpa*totalnpavotes)
-            barchartdata = pd.DataFrame({
-                "Candidate": ["Your Candidate", "Opposing Candidate"],
-                "Votes": [totalgood, totalbad]
-            })
-
-            #Guestimate Bar Chart
-            st.subheader("") # add spacing
-            fig, ax = plt.subplots(figsize=(8, 6))
-            barchartdata.plot(x="Candidate", y="Votes", kind="bar", ax=ax, color=["blue", "red"])
-            ax.set_title("Candidate Vote Totals")
-            ax.set_xlabel("Candidate")
-            ax.set_ylabel("Votes")
-            st.pyplot(fig)
-            #TO-DO: Add error bars
-
-            st.subheader("") # add spacing
-            st.write("Click here to produce a pdf file of this report:")
-            st.button("Print Report", key=print, type="primary")
-
-        else:
-          st.error("Uploaded CSV files are missing required columns.")
-    else:
-          st.info("Please upload or specify a valid CSV file")
+    # Ensure required columns are present in the CSV file
+    required_columns = ["DATE", "VBM-DEM", "VBM-REP", "VBM-NPA", "VBM-TOTAL", "VBM-CUM", "EV-DEM", "EV-REP", "EV-NPA","EV-TOTAL","EV-CUM","ED-DEM","ED-REP","ED-NPA","ED-TOTAL","TOTAL VOTES","CUM TOTAL"]
+    if set(df.columns) == set(required_columns):
+        col1,col2 =st.columns(2)
+        with col1:
+            st.write(f"Current update date: {df['DATE'].iloc[-1]}")
+        with col2:
+            st.write(f"Previous update date: {df['DATE'].iloc[-2]}")
+        st.metric(label="Total Votes Cast This Election", value=int(df['CUM TOTAL'].iloc[-1]), delta=int(df['CUM TOTAL'].iloc[-1] - df['CUM TOTAL'].iloc[-2]))
+        col1,col2,col3 = st.columns(3)
+        with col1:
+            total_dem = int(df['VBM-DEM'].iloc[-1] + df['EV-DEM'].iloc[-1])
+            prev_dem = int(df['VBM-DEM'].iloc[-2] + df['EV-DEM'].iloc[-2])
+            st.metric(label="Total DEM Votes", value=total_dem, delta=total_dem-prev_dem)
+        with col2:
+            total_rep = int(df['VBM-REP'].iloc[-1] + df['EV-REP'].iloc[-1])
+            prev_rep = int(df['VBM-REP'].iloc[-2] + df['EV-REP'].iloc[-2])
+            st.metric(label="Total REP Votes", value=total_rep, delta=total_rep-prev_rep)
+        with col3:
+            total_npa = int(df['VBM-NPA'].iloc[-1] + df['EV-NPA'].iloc[-1])
+            prev_npa = int(df['VBM-NPA'].iloc[-2] + df['EV-NPA'].iloc[-2])
+            st.metric(label="Total NPA/Other Votes", value=total_npa, delta=total_npa-prev_npa)
+    
+        st.subheader("")
+        # Create Vote over Time Line Plot
+        plt.figure(figsize=(10, 6))
+        plt.plot(df["DATE"], df["CUM TOTAL"], label="Total Votes")
+        plt.plot(df["DATE"], df["EV-CUM"], label="Total Early Votes")
+        plt.plot(df["DATE"], df["VBM-CUM"], label="Total Vote By Mail Votes")
+        # Set labels and title
+        plt.xlabel("Date")
+        plt.ylabel("Votes")
+        plt.title("Election Votes Over Time")
+        # Add legend
+        plt.legend()
+        # Rotate x-axis labels for better readability
+        plt.xticks(rotation=45)
+        # Show the plot
+        plt.grid(True)
+        plt.tight_layout()
+        st.pyplot(plt)
+    
+        st.subheader("")
+        # VBM vs Early Vote Pie Chart
+        # Calculate the percentage of each vote type
+        vote_by_mail_percentage = (df['VBM-CUM'].iloc[-1] / df['CUM TOTAL'].iloc[-1]) * 100
+        early_vote_percentage = (df['EV-CUM'].iloc[-1]/ df['CUM TOTAL'].iloc[-1]) * 100
+        # Create the pie chart
+        plt.figure(figsize=(6, 6))
+        # Define the data for the pie chart
+        data = [vote_by_mail_percentage, early_vote_percentage]
+        labels = ['Vote By Mail', 'Early Vote']
+        colors = ['lightblue', 'lightgreen']
+        # Create the pie chart
+        plt.pie(data, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+        # Add title
+        plt.title('Vote By Mail vs. Early Vote')
+        # Display the chart
+        st.pyplot(plt)
+    
+        st.subheader("")
+        # VBM Party Breadkdown Pie Chart
+        # Calculate the percentage of each vote type
+        vbm_dem = (df['VBM-DEM'].sum() / df['VBM-CUM'].iloc[-1]) * 100
+        vbm_rep = (df['VBM-REP'].sum() / df['VBM-CUM'].iloc[-1]) * 100
+        vbm_npa = (df['VBM-NPA'].sum() / df['VBM-CUM'].iloc[-1]) * 100
+        # Create the pie chart
+        plt.figure(figsize=(6, 6))
+        # Define the data for the pie chart
+        data = [vbm_dem, vbm_rep, vbm_npa]
+        labels = ['Dem', 'Rep', 'NPA/Other']
+        colors = ['blue', 'red', 'green']
+        # Create the pie chart
+        plt.pie(data, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+        # Add title
+        plt.title('Vote By Mail by Party')
+        # Display the chart
+        st.pyplot(plt)
+    
+        st.subheader("")
+        # EV Party Breadkdown Pie Chart
+        # Calculate the percentage of each vote type
+        ev_dem = (df['EV-DEM'].sum() / df['EV-CUM'].iloc[-1]) * 100
+        ev_rep = (df['EV-REP'].sum() / df['EV-CUM'].iloc[-1]) * 100
+        ev_npa = (df['EV-NPA'].sum() / df['EV-CUM'].iloc[-1]) * 100
+        # Create the pie chart
+        plt.figure(figsize=(6, 6))
+        # Define the data for the pie chart
+        data = [ev_dem, ev_rep, ev_npa]
+        labels = ['Dem', 'Rep', 'NPA/Other']
+        colors = ['blue', 'red', 'green']
+        # Create the pie chart
+        plt.pie(data, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+        # Add title
+        plt.title('Early Voting by Party')
+        # Display the chart
+        st.pyplot(plt)
+    
+        st.divider()
+        #Analysis tool for determining current race status
+        st.header("The Guestimator Tool")
+        st.write("Use the sliders below to guestimate how your candidate is performing. The tool uses the uploaded current vote data.")
+        totaldemvotes = df['VBM-DEM'].sum() + df['EV-DEM'].sum()
+        totalrepvotes = df['VBM-REP'].sum() + df['EV-REP'].sum()
+        totalnpavotes = df['VBM-NPA'].sum() + df['EV-NPA'].sum()
+        col1,col2 = st.columns(2)
+        with col1:
+            st.subheader("Good Guys")
+            gooddem = st.slider("Est. percentage of DEM Vote for your candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
+            goodrep = st.slider("Est. percentage of REP Vote for your candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
+            goodnpa = st.slider("Est. percentage of NPA/Other Vote for your candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
+        with col2:
+            st.subheader("Bad Guys")
+            baddem = st.slider("Est. percentage of DEM Vote for other candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
+            badrep = st.slider("Est. percentage of REP Vote for other candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
+            badnpa = st.slider("Est. percentage of NPA/Other Vote for other candidate",min_value=0.00,max_value=1.00,value=0.50,step=0.05)
+        #Calculate Total Votes for each Candidate
+        totalgood = (gooddem*totaldemvotes) + (goodrep*totalrepvotes) + (goodnpa*totalnpavotes)
+        totalbad = (baddem*totaldemvotes) + (badrep*totalrepvotes) + (badnpa*totalnpavotes)
+        barchartdata = pd.DataFrame({
+            "Candidate": ["Your Candidate", "Opposing Candidate"],
+            "Votes": [totalgood, totalbad]
+        })
+    
+        #Guestimate Bar Chart
+        st.subheader("") # add spacing
+        fig, ax = plt.subplots(figsize=(8, 6))
+        barchartdata.plot(x="Candidate", y="Votes", kind="bar", ax=ax, color=["blue", "red"])
+        ax.set_title("Candidate Vote Totals")
+        ax.set_xlabel("Candidate")
+        ax.set_ylabel("Votes")
+        st.pyplot(fig)
+        #TO-DO: Add error bars
+    
+        st.subheader("") # add spacing
+        st.write("Click here to produce a pdf file of this report:")
+        st.button("Print Report", key=print, type="primary")
+    
     st.success("Election Runup Analysis Report Generated.")  # Placeholder
 
 
@@ -342,7 +316,7 @@ def main():
                                    ["Voter Engagement", "Election Runup Analysis"])
 
         # Data source selection
-        data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"])
+        data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"],placeholder="Choose an option")
         uploaded_file = None
         drive_path = None
 
