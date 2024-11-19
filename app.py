@@ -294,7 +294,7 @@ def main():
 
     # Login screen
     if not st.session_state.logged_in:
-        st.image(LOGO_PATH, width=250)
+        st.image("Campaign-Reporter_Logo.png", width=200)
         st.title("Login to Reporter App")
 
         username = st.text_input("Username")
@@ -307,7 +307,7 @@ def main():
             else:
                 st.error("Invalid username or password.")
     else:
-        st.image(LOGO_PATH, width=225)
+        st.image("Campaign-Reporter_Logo.png", width=200)
         st.title("Election Reporter Tool")
         st.divider()
 
