@@ -30,140 +30,114 @@ def load_csv(data_source, uploaded_file=None, drive_path=None):
 
 # Voter Engagement Report logic
 def voter_engagement_report(df):
-    st.subheader("Engagement Tracker Data File")
-    # Select data source
-    st.write("Select CSV File Source")
-    data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"], key=999)
-    # Initialize DataFrame
-    df = None
-
-    if data_source == "Local file upload":
-        # File upload
-        uploaded_file = st.file_uploader("Upload a CSV file", type="csv", key=998)
-        if uploaded_file is not None:
-            df = pd.read_csv(uploaded_file)
-    elif data_source == "Google Drive path":
-        # Text input for Google Drive file path
-        drive_path = st.text_input("Enter the full path to your CSV file in Google Drive:")
-        if drive_path:
-            if os.path.exists(drive_path):  # Check if the file exists
-                df = pd.read_csv(drive_path)
-            else:
-                st.error("The specified path does not exist. Please check the path and try again.")
-
     st.divider()
+    st.header("Voter Engagement Results Report")
+    st.write("Select which engagements you would like included in the report")
+    col1,col2,col3 = st.columns(3)
+    with col1:
+      textop = st.checkbox("Include Texts")
+    with col2:
+      callop = st.checkbox("Include Calls")
+    with col3:
+      canvassop = st.checkbox("Include Canvasses")
+    st.divider()
+    # Convert all columns except 'DATE' to numeric
+    # Convert columns to numeric, handling non-numeric values
+    allcolbutdate = df.columns.drop('DATE')
+    df[allcolbutdate] = df[allcolbutdate].apply(pd.to_numeric, errors='coerce')
+    totalsumcolumn = df[allcolbutdate].sum(axis=1)
+    text_columns = [col for col in df.columns if col.startswith("TEXT-")]
+    totaltextcolumn = df[text_columns].sum(axis=1)
+    call_columns = [col for col in df.columns if col.startswith("CALL-")]
+    totalcallcolumn = df[call_columns].sum(axis=1)
+    canvas_columns = [col for col in df.columns if col.startswith("DOOR-")]
+    totalcanvasscolumn = df[canvas_columns].sum(axis=1)
+    Dem_columns = [col for col in df.columns if col.endswith("-DEM")]
+    totalDemcolumn = df[Dem_columns].sum(axis=1)
+    Rep_columns = [col for col in df.columns if col.endswith("-REP")]
+    totalRepcolumn = df[Rep_columns].sum(axis=1)
+    Npa_columns = [col for col in df.columns if col.endswith("-NPA")]
+    totalNpacolumn = df[Npa_columns].sum(axis=1)
+    
+    lastrow = df.iloc[-1]
+    secondlastrow = df.iloc[-2]
+    st.subheader("Metrics At A Glance")
+    prevTotalReached = int(secondlastrow.drop("DATE").sum())
+    totalReached = int(lastrow.drop("DATE").sum())
+    prevTotalcanvassed = int(totalcanvasscolumn.iloc[-2])
+    totalcanvassed = int(totalcanvasscolumn.iloc[-1])
+    col1,col2 =st.columns(2)
+    with col1:
+      st.write(f"Current update date: {df['DATE'].iloc[-1]}")
+      st.metric("Total Voters Reached", value = totalReached, delta = totalReached-prevTotalReached)
+    with col2:
+      st.write(f"Previous update date: {df['DATE'].iloc[-2]}")
+      st.metric("Total Canvassed", value = totalcanvassed, delta = totalcanvassed-prevTotalcanvassed)
+    
+    st.subheader(" ")
+    # Create Engagement over Time Line Plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(df["DATE"], totalsumcolumn, label="Total Engagements")
+    plt.plot(df["DATE"], totaltextcolumn, label="Total Text")
+    plt.plot(df["DATE"], totalcallcolumn, label="Total Call")
+    plt.plot(df["DATE"], totalcanvasscolumn, label="Total Canvass")
+    # Set labels and title
+    plt.xlabel("Date")
+    plt.ylabel("Voters Reached")
+    plt.title("Voters Reached Over Time")
+    # Add legend
+    plt.legend()
+    # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45)
+    # Show the plot
+    plt.grid(True)
+    plt.tight_layout()
+    st.pyplot(plt)
+    
+    st.subheader(" ")
+    #Engagement Type By Pie Chart
+    total_text = totaltextcolumn.sum()
+    total_call = totalcallcolumn.sum()
+    total_canvass = totalcanvasscolumn.sum()
+    text_percentage = total_text/totalReached
+    call_percentage = total_call/totalReached
+    canvas_percentage = total_canvass/totalReached
+    # Create the pie chart
+    plt.figure(figsize=(6, 6))
+    # Define the data for the pie chart
+    data = [text_percentage, call_percentage, canvas_percentage]
+    labels = ['Text', 'Call', 'Canvass']
+    colors = ['cadetblue', 'powderblue', 'steelblue']
+    # Create the pie chart
+    plt.pie(data, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+    # Add title
+    plt.title('Engagement Method Type')
+    # Display the chart
+    st.pyplot(plt)
+    
+    #Engagement Type By Party Vertical Bar Chart
+    st.subheader("") # add spacing
+    barchartdata = pd.DataFrame({
+            "Party": ["Democrat", "Republican", "NPA/Other"],
+            "Voters": [totalDemcolumn.sum(), totalRepcolumn.sum(), totalNpacolumn.sum()]
+        })
+    fig, ax = plt.subplots(figsize=(8, 6))
+    barchartdata.plot(x="Party", y="Voters", kind="bar", ax=ax, color=["dodgerblue", "red", "goldenrod"])
+    ax.set_title("Engagements By Party")
+    ax.set_xlabel("Party")
+    ax.set_ylabel("Voters")
+    st.pyplot(fig)
+    
+    #Full data table
+    st.subheader(" ")
+    st.subheader("Full Engagement Data Table")
+    st.write(df[allcolbutdate])
+    
+    st.subheader("") # add spacing
+    st.write("Click here to produce a pdf file of this report:")
+    st.button("Print Report", key=print, type="primary")
 
-    if df is not None:
-      st.header("Voter Engagement Results Report")
-      st.write("Select which engagements you would like included in the report")
-      col1,col2,col3 = st.columns(3)
-      with col1:
-          textop = st.checkbox("Include Texts")
-      with col2:
-          callop = st.checkbox("Include Calls")
-      with col3:
-          canvassop = st.checkbox("Include Canvasses")
-      st.divider()
-      # Convert all columns except 'DATE' to numeric
-      # Convert columns to numeric, handling non-numeric values
-      allcolbutdate = df.columns.drop('DATE')
-      df[allcolbutdate] = df[allcolbutdate].apply(pd.to_numeric, errors='coerce')
-      totalsumcolumn = df[allcolbutdate].sum(axis=1)
-      text_columns = [col for col in df.columns if col.startswith("TEXT-")]
-      totaltextcolumn = df[text_columns].sum(axis=1)
-      call_columns = [col for col in df.columns if col.startswith("CALL-")]
-      totalcallcolumn = df[call_columns].sum(axis=1)
-      canvas_columns = [col for col in df.columns if col.startswith("DOOR-")]
-      totalcanvasscolumn = df[canvas_columns].sum(axis=1)
-      Dem_columns = [col for col in df.columns if col.endswith("-DEM")]
-      totalDemcolumn = df[Dem_columns].sum(axis=1)
-      Rep_columns = [col for col in df.columns if col.endswith("-REP")]
-      totalRepcolumn = df[Rep_columns].sum(axis=1)
-      Npa_columns = [col for col in df.columns if col.endswith("-NPA")]
-      totalNpacolumn = df[Npa_columns].sum(axis=1)
-
-      lastrow = df.iloc[-1]
-      secondlastrow = df.iloc[-2]
-      st.subheader("Metrics At A Glance")
-      prevTotalReached = int(secondlastrow.drop("DATE").sum())
-      totalReached = int(lastrow.drop("DATE").sum())
-      prevTotalcanvassed = int(totalcanvasscolumn.iloc[-2])
-      totalcanvassed = int(totalcanvasscolumn.iloc[-1])
-      col1,col2 =st.columns(2)
-      with col1:
-          st.write(f"Current update date: {df['DATE'].iloc[-1]}")
-          st.metric("Total Voters Reached", value = totalReached, delta = totalReached-prevTotalReached)
-      with col2:
-          st.write(f"Previous update date: {df['DATE'].iloc[-2]}")
-          st.metric("Total Canvassed", value = totalcanvassed, delta = totalcanvassed-prevTotalcanvassed)
-
-      st.subheader(" ")
-      # Create Engagement over Time Line Plot
-      plt.figure(figsize=(10, 6))
-      plt.plot(df["DATE"], totalsumcolumn, label="Total Engagements")
-      plt.plot(df["DATE"], totaltextcolumn, label="Total Text")
-      plt.plot(df["DATE"], totalcallcolumn, label="Total Call")
-      plt.plot(df["DATE"], totalcanvasscolumn, label="Total Canvass")
-      # Set labels and title
-      plt.xlabel("Date")
-      plt.ylabel("Voters Reached")
-      plt.title("Voters Reached Over Time")
-      # Add legend
-      plt.legend()
-      # Rotate x-axis labels for better readability
-      plt.xticks(rotation=45)
-      # Show the plot
-      plt.grid(True)
-      plt.tight_layout()
-      st.pyplot(plt)
-
-      st.subheader(" ")
-      #Engagement Type By Pie Chart
-      total_text = totaltextcolumn.sum()
-      total_call = totalcallcolumn.sum()
-      total_canvass = totalcanvasscolumn.sum()
-      text_percentage = total_text/totalReached
-      call_percentage = total_call/totalReached
-      canvas_percentage = total_canvass/totalReached
-      # Create the pie chart
-      plt.figure(figsize=(6, 6))
-      # Define the data for the pie chart
-      data = [text_percentage, call_percentage, canvas_percentage]
-      labels = ['Text', 'Call', 'Canvass']
-      colors = ['cadetblue', 'powderblue', 'steelblue']
-      # Create the pie chart
-      plt.pie(data, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
-      # Add title
-      plt.title('Engagement Method Type')
-      # Display the chart
-      st.pyplot(plt)
-
-      #Engagement Type By Party Vertical Bar Chart
-      st.subheader("") # add spacing
-      barchartdata = pd.DataFrame({
-                "Party": ["Democrat", "Republican", "NPA/Other"],
-                "Voters": [totalDemcolumn.sum(), totalRepcolumn.sum(), totalNpacolumn.sum()]
-            })
-      fig, ax = plt.subplots(figsize=(8, 6))
-      barchartdata.plot(x="Party", y="Voters", kind="bar", ax=ax, color=["dodgerblue", "red", "goldenrod"])
-      ax.set_title("Engagements By Party")
-      ax.set_xlabel("Party")
-      ax.set_ylabel("Voters")
-      st.pyplot(fig)
-
-      #Full data table
-      st.subheader(" ")
-      st.subheader("Full Engagement Data Table")
-      st.write(df[allcolbutdate])
-
-      st.subheader("") # add spacing
-      st.write("Click here to produce a pdf file of this report:")
-      st.button("Print Report", key=print, type="primary")
-
-    else:
-          st.info("Please upload or specify a valid CSV file")
-
-    st.success("Voter Engagement Report Generated.")  # Placeholder
+st.success("Voter Engagement Report Generated.")  # Placeholder
 
 
 # Election Runup Analysis Report logic
