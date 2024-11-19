@@ -137,8 +137,6 @@ def voter_engagement_report(df):
     st.write("Click here to produce a pdf file of this report:")
     st.button("Print Report", key=print, type="primary")
 
-st.success("Voter Engagement Report Generated.")  # Placeholder
-
 
 # Election Runup Analysis Report logic
 def election_runup_report(df):
@@ -282,9 +280,6 @@ def election_runup_report(df):
         st.subheader("") # add spacing
         st.write("Click here to produce a pdf file of this report:")
         st.button("Print Report", key=print, type="primary")
-    
-    st.success("Election Runup Analysis Report Generated.")  # Placeholder
-
 
 
 # Main application
