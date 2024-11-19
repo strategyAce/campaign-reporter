@@ -39,7 +39,7 @@ def voter_engagement_report(df):
 
     if data_source == "Local file upload":
         # File upload
-        uploaded_file = st.file_uploader("Upload a CSV file", type="csv", key=998))
+        uploaded_file = st.file_uploader("Upload a CSV file", type="csv", key=998)
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
     elif data_source == "Google Drive path":
