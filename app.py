@@ -39,7 +39,7 @@ def voter_engagement_report(df):
 
     if data_source == "Local file upload":
         # File upload
-        uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
+        uploaded_file = st.file_uploader("Upload a CSV file", type="csv", key=998))
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
     elif data_source == "Google Drive path":
@@ -171,13 +171,13 @@ def election_runup_report(df):
     st.subheader("Pre-Election Day Data File")
     # Select data source
     st.write("Select CSV File Source")
-    data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"],key=998)
+    data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"],key=997)
     # Initialize DataFrame
     df = None
 
     if data_source == "Local file upload":
         # File upload
-        uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
+        uploaded_file = st.file_uploader("Upload a CSV file", type="csv", key=996))
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
     elif data_source == "Google Drive path":
