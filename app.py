@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import os
 
 # Constants
-LOGO_PATH = "https://github.com/strategyAce/campaign-reporter/blob/main/Campaign-Reporter_Logo.png"
+BANNER_PATH = "StratAceBanner_Logo.png"
+LOGO_PATH = "Campaign-Reporter_Logo.png"
+url = "https://strategyace.win/"
 USERNAME = "ClientX"
 PASSWORD = "stratbomb"
 
@@ -136,6 +138,9 @@ def voter_engagement_report(df):
     st.subheader("") # add spacing
     st.write("Click here to produce a pdf file of this report:")
     st.button("Print Report", key=print, type="primary")
+
+    st.image(BANNER_PATH,width=300)
+    st.write(url)
 
 
 # Election Runup Analysis Report logic
@@ -281,6 +286,9 @@ def election_runup_report(df):
         st.write("Click here to produce a pdf file of this report:")
         st.button("Print Report", key=print, type="primary")
 
+        st.image(BANNER_PATH,width=300)
+        st.write(url)
+
 
 # Main application
 def main():
@@ -289,9 +297,16 @@ def main():
 
     # Login screen
     if not st.session_state.logged_in:
-        st.image("Campaign-Reporter_Logo.png", width=200)
-        st.title("Login to Reporter App")
-
+        st.image(BANNER_PATH,width=550)
+        st.subheader(" ")
+        col1,col2 = st.columns(2)
+        with col1:
+            st.title("Reporter Tool")
+            st.subheader("Create Voter Engagement and Election Reports")
+        with col2:
+            st.image(LOGO_PATH,width=225)
+            
+        st.title("Login")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
 
@@ -302,8 +317,14 @@ def main():
             else:
                 st.error("Invalid username or password.")
     else:
-        st.image("Campaign-Reporter_Logo.png", width=200)
-        st.title("Election Reporter Tool")
+        st.image(BANNER_PATH,width=550)
+        st.subheader(" ")
+        col1,col2 = st.columns(2)
+        with col1:
+            st.title("Election Reporter Tool")
+            st.subheader("Create a precinct list optimized for your campaign's strategy.")
+        with col2: 
+            st.image(LOGO_PATH, width=250) 
         st.divider()
 
         # Report type selection
