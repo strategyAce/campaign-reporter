@@ -325,6 +325,8 @@ def main():
             st.subheader("Create a precinct list optimized for your campaign's strategy.")
         with col2: 
             st.image(LOGO_PATH, width=250) 
+        st.write("This is a product of Strategy Ace LLC")
+        st.write("version: BETAv0.1")
         st.divider()
 
         # Report type selection
