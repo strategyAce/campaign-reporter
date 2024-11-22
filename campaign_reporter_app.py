@@ -297,7 +297,7 @@ def main():
 
     # Login screen
     if not st.session_state.logged_in:
-        st.image(BANNER_PATH,width=550)
+        st.image(BANNER_PATH,width=None)
         st.subheader(" ")
         col1,col2 = st.columns(2)
         with col1:
@@ -317,7 +317,19 @@ def main():
             else:
                 st.error("Invalid username or password.")
     else:
-        st.image(BANNER_PATH,width=550)
+        # Sidebar with expandable User Guide section
+        with st.sidebar.title("📘 User Guide / Instructions"):
+            st.sidebar.write("""
+            Welcome to the Campaign Reporter Tool!
+
+            **Tool Overview:**
+               TBD
+    
+            **Instructions:**
+
+            """)
+        
+        st.image(BANNER_PATH,width=None)
         st.subheader(" ")
         col1,col2 = st.columns(2)
         with col1:
