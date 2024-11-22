@@ -344,6 +344,7 @@ def main():
         # Report type selection
         report_type = st.selectbox("What kind of Report do you want to create?",
                                    ["Voter Engagement", "Election Runup Analysis"])
+        st.subheader(" ")
         with st.container(border=True):
             # Data source selection
             data_source = st.radio("Choose the source of your CSV file:", ["Local file upload", "Google Drive path"])
@@ -354,16 +355,16 @@ def main():
                 uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
             elif data_source == "Google Drive path":
                 drive_path = st.text_input("Enter the path to your CSV file:")
-    
-            df = load_csv(data_source, uploaded_file, drive_path)
-    
-            if df is not None:
-                if report_type == "Voter Engagement":
-                    voter_engagement_report(df)
-                elif report_type == "Election Runup Analysis":
-                    election_runup_report(df)
-            else:
-                st.info("Please upload or specify a valid CSV file.")
+
+        df = load_csv(data_source, uploaded_file, drive_path)
+
+        if df is not None:
+            if report_type == "Voter Engagement":
+                voter_engagement_report(df)
+            elif report_type == "Election Runup Analysis":
+                election_runup_report(df)
+        else:
+            st.info("Please upload or specify a valid CSV file.")
 
 if __name__ == "__main__":
     main()
