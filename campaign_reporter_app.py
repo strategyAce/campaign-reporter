@@ -7,8 +7,6 @@ import os
 BANNER_PATH = "StratAceBanner_Logo.png"
 LOGO_PATH = "Campaign-Reporter_Logo.png"
 url = "https://strategyace.win/"
-USERNAME = "ClientX"
-PASSWORD = "stratbomb"
 
 # Authentication function
 def authenticate(username, password):
