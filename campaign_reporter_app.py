@@ -10,6 +10,8 @@ url = "https://strategyace.win/"
 
 # Authentication function
 def authenticate(username, password):
+    USERNAME = os.environ.get('USERNAME')
+    PASSWORD = os.environ.get('PASSWORD')
     return username == USERNAME and password == PASSWORD
 
 # Function to load CSV
